@@ -21,6 +21,37 @@ body {
     color: #2c3e50;
 }
 
+/* Quick preset buttons */
+.preset-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.preset-btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.preset-btn:hover {
+    background-color: #e5e7eb;
+}
+
+.preset-btn.active {
+    background-color: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
 .form-control:read-only {
     background-color: #f8f9fa;
 }
@@ -29,6 +60,8 @@ body {
     font-weight: 500;
     font-size: 0.875rem;
     color: #4a5568;
+    display: block;
+    margin-bottom: 0.5rem;
 }
 
 /* Contemporary blue select styling */
@@ -56,6 +89,13 @@ body {
 
 input[type="number"] {
     text-align: right;
+    height: 42px;
+}
+
+.form-control, .form-select {
+    border: 1px solid #d1d5db;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    height: 42px;
 }
 
 .form-check-label {
@@ -65,8 +105,8 @@ input[type="number"] {
 /* Grid Layout for Building Data */
 .building-data-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
 }
 
 /* Results Grid Boxes */
