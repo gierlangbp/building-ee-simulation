@@ -895,6 +895,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Add event listener to emission factor dropdown
+    document.getElementById('emissionFactor').addEventListener('change', function() {
+        calculateEnergySavings();
+    });
+    
     // Add thousands separator to monthly bill input
     const monthlyBillInput = document.getElementById('monthlyBill');
     
