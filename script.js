@@ -209,7 +209,7 @@ function calculateBuildingMetrics() {
     const wwr = parseFloat(document.getElementById('wwr').value) || 0;
     const roofType = document.getElementById('roofType').value;
     const roofAngle = parseFloat(document.getElementById('roofAngle').value) || 0;
-    const monthlyBill = parseFloat(document.getElementById('monthlyBill').value) || 0;
+    const monthlyBill = parseMonthlyBill(document.getElementById('monthlyBill').value) || 0;
     const electricityRate = parseFloat(document.getElementById('electricityRate').value) || 1587.92;
 
     // Calculate areas
@@ -256,6 +256,13 @@ function calculateEnergySavings() {
             }
         }
     });
+    
+    // Format the monthly bill input if needed
+    const monthlyBillInput = document.getElementById('monthlyBill');
+    if (monthlyBillInput.value && !monthlyBillInput.value.includes('.') && monthlyBillInput.value.length > 3) {
+        monthlyBillInput.value = formatMonthlyBill(monthlyBillInput.value);
+    }
+    
     // Get base consumption from the text content now, not from input value
     const energyConsumptionText = document.getElementById('energyConsumption').innerHTML;
     // Extract numeric value by removing units (MWh) and then parse
@@ -277,13 +284,11 @@ function calculateEnergySavings() {
         const windowArea = parseFloat(windowAreaText.replace(' m²', '').replace(/\./g, '').replace(/,/g, '.'));
         const solarGlassInvestment = windowArea * 0.5 * 650000;
         
-        // Update the investment input field with the calculated value
+        // Always update the investment input field with the calculated value
         const solarGlassInvestmentInput = document.getElementById('solarGlassInvestment');
-        if (!solarGlassInvestmentInput.value || parseInvestment(solarGlassInvestmentInput.value) === 0) {
-            solarGlassInvestmentInput.value = formatInvestment(solarGlassInvestment);
-        }
+        solarGlassInvestmentInput.value = formatInvestment(solarGlassInvestment);
         
-        totalInvestment += parseInvestment(solarGlassInvestmentInput.value) || solarGlassInvestment;
+        totalInvestment += parseInvestment(solarGlassInvestmentInput.value);
     }
 
     // Reflective roof
@@ -295,13 +300,11 @@ function calculateEnergySavings() {
         const roofArea = parseFloat(roofAreaText.replace(' m²', '').replace(/\./g, '').replace(/,/g, '.'));
         const reflectiveRoofInvestment = (roofArea / 20) * 1700000;
         
-        // Update the investment input field with the calculated value
+        // Always update the investment input field with the calculated value
         const reflectiveRoofInvestmentInput = document.getElementById('reflectiveRoofInvestment');
-        if (!reflectiveRoofInvestmentInput.value || parseInvestment(reflectiveRoofInvestmentInput.value) === 0) {
-            reflectiveRoofInvestmentInput.value = formatInvestment(reflectiveRoofInvestment);
-        }
+        reflectiveRoofInvestmentInput.value = formatInvestment(reflectiveRoofInvestment);
         
-        totalInvestment += parseInvestment(reflectiveRoofInvestmentInput.value) || reflectiveRoofInvestment;
+        totalInvestment += parseInvestment(reflectiveRoofInvestmentInput.value);
     }
 
     // Cooling system
@@ -335,13 +338,11 @@ function calculateEnergySavings() {
         
         totalReduction += coolingReduction;
         
-        // Update the investment input field with the calculated value
+        // Always update the investment input field with the system cost value when selecting or changing systems
         const coolingInvestmentInput = document.getElementById('coolingInvestment');
-        if (!coolingInvestmentInput.value || parseInvestment(coolingInvestmentInput.value) === 0) {
-            coolingInvestmentInput.value = formatInvestment(coolingSystemData.cost);
-        }
+        coolingInvestmentInput.value = formatInvestment(coolingSystemData.cost);
         
-        totalInvestment += parseInvestment(coolingInvestmentInput.value) || coolingSystemData.cost;
+        totalInvestment += parseInvestment(coolingInvestmentInput.value);
     }
 
     // BMS
@@ -749,7 +750,95 @@ function getCoolingOptionBaseName(optionValue, coolingType) {
     }
 }
 
+// Format monthly bill with thousand separator
+function formatMonthlyBill(value) {
+    if (!value) return '';
+    // Remove any non-numeric characters and parse
+    const numericValue = parseFloat(value.toString().replace(/[^0-9]/g, ''));
+    if (isNaN(numericValue) || numericValue === 0) return '';
+    
+    // Convert to string with no decimals
+    const formatted = numericValue.toFixed(0);
+    
+    // Add thousand separators using dots
+    return formatted.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// Parse monthly bill value (removes dots)
+function parseMonthlyBill(formattedValue) {
+    if (!formattedValue) return 0;
+    // Remove any thousand separators
+    return parseFloat(formattedValue.toString().replace(/\./g, '')) || 0;
+}
+
+// Function to apply preset values
+function applyPreset(preset) {
+    if (preset === 'lowRise') {
+        document.getElementById('width').value = 20;
+        document.getElementById('length').value = 50;
+        document.getElementById('floors').value = 2;
+        document.getElementById('floorHeight').value = 4;
+        document.getElementById('wwr').value = 40;
+        document.getElementById('roofType').value = 'perisai';
+        document.getElementById('roofAngleDiv').style.display = 'block';
+        document.getElementById('roofAngle').value = 30;
+        document.getElementById('monthlyBill').value = '33.500.000';
+        document.getElementById('coolingSystem').value = 'split'; // AC Split for Tingkat Rendah
+    } else if (preset === 'highRise') {
+        document.getElementById('width').value = 40;
+        document.getElementById('length').value = 40;
+        document.getElementById('floors').value = 16;
+        document.getElementById('floorHeight').value = 3.5;
+        document.getElementById('wwr').value = 40;
+        document.getElementById('roofType').value = 'datar';
+        document.getElementById('roofAngleDiv').style.display = 'none';
+        document.getElementById('monthlyBill').value = '1.000.000.000';
+        document.getElementById('coolingSystem').value = 'central'; // AC Central for Tingkat Tinggi
+    }
+    
+    // Ensure roofAngle visibility is correctly set based on roof type
+    const roofType = document.getElementById('roofType').value;
+    document.getElementById('roofAngleDiv').style.display = roofType === 'datar' ? 'none' : 'block';
+    
+    // Make sure monthly bill is properly formatted
+    const monthlyBillInput = document.getElementById('monthlyBill');
+    if (monthlyBillInput.value) {
+        // This is already formatted, so we don't need to do anything
+        // Just ensuring it's properly recognized by the system
+        const numericValue = parseMonthlyBill(monthlyBillInput.value);
+        console.log('Monthly bill numeric value:', numericValue);
+    }
+
+    // Update UI and recalculate
+    calculateBuildingMetrics();
+    // Update cooling intervention options based on the cooling system type
+    updateCoolingInterventionOptions();
+    updateInterventionReductions();
+    calculateEnergySavings();
+}
+
+// Function to clear form data on page reload
+function resetFormOnReload() {
+    if (performance.navigation.type === 1) { // Check if page was reloaded
+        // Clear building data
+        document.getElementById('width').value = '';
+        document.getElementById('length').value = '';
+        document.getElementById('floors').value = '';
+        document.getElementById('floorHeight').value = '';
+        document.getElementById('wwr').value = '';
+        document.getElementById('roofType').value = 'datar';
+        document.getElementById('roofAngleDiv').style.display = 'none';
+        
+        // Clear system parameters
+        document.getElementById('monthlyBill').value = '';
+        document.getElementById('coolingSystem').value = 'split';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Clear form on reload
+    resetFormOnReload();
+    
     // Initial call to update the reduction values
     updateInterventionReductions();
     
@@ -757,6 +846,25 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('roofType').addEventListener('change', function() {
         const roofAngleDiv = document.getElementById('roofAngleDiv');
         roofAngleDiv.style.display = this.value === 'datar' ? 'none' : 'block';
+    });
+    
+    // Add preset button listeners
+    document.getElementById('lowRisePreset').addEventListener('click', function() {
+        // Remove active class from all preset buttons
+        document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+        // Add active class to this button
+        this.classList.add('active');
+        // Apply preset
+        applyPreset('lowRise');
+    });
+    
+    document.getElementById('highRisePreset').addEventListener('click', function() {
+        // Remove active class from all preset buttons
+        document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+        // Add active class to this button
+        this.classList.add('active');
+        // Apply preset
+        applyPreset('highRise');
     });
     
     // Add cooling system type change listener
@@ -787,6 +895,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Add thousands separator to monthly bill input
+    const monthlyBillInput = document.getElementById('monthlyBill');
+    
+    // Format the monthly bill when user finishes typing
+    monthlyBillInput.addEventListener('blur', function() {
+        if (this.value) {
+            this.value = formatMonthlyBill(this.value);
+        }
+    });
+    
+    // When focusing on monthly bill, remove formatting for easier editing
+    monthlyBillInput.addEventListener('focus', function() {
+        const numericValue = parseMonthlyBill(this.value);
+        this.value = numericValue > 0 ? numericValue : '';
+    });
+    
     // Add event listeners for investment inputs
     const investmentInputs = document.querySelectorAll('.investment-input');
     investmentInputs.forEach(input => {
@@ -808,16 +932,6 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('input', calculateEnergySavings);
     });
 
-        // Set default values to ensure chart works on initial load
-    document.getElementById('width').value = 30;
-    document.getElementById('length').value = 40;
-    document.getElementById('floors').value = 10;
-    document.getElementById('floorHeight').value = 3.5;
-    document.getElementById('wwr').value = 40;
-    document.getElementById('monthlyBill').value = 300000000;
-    document.getElementById('electricityRate').value = 1587.92;
-    document.getElementById('emissionFactor').value = 0.87;
-    
     // Set investment default values
     document.getElementById('bmsInvestment').value = '855.000.000';
     document.getElementById('exhaustSensorInvestment').value = '60.000.000';
