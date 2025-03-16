@@ -198,6 +198,15 @@ input[type="number"], input[type="text"] {
     margin-bottom: 1rem;
 }
 
+/* Reduction percentage styling */
+.reduction-percentage {
+    font-size: 0.8rem;
+    color: #34D399; /* Green color */
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 0.2rem;
+}
+
 /* Align form inputs */
 .building-data-grid .mb-3 {
     display: flex;
@@ -365,6 +374,11 @@ canvas {
     line-height: 1.1;
     color: #C8102E; /* Monocle Red */
     font-family: 'EB Garamond', 'Georgia', 'Times New Roman', serif;
+}
+
+/* Special styling for tree metric */
+#treesEquivalent {
+    color: #34D399; /* Green color */
 }
 
 .metric-label {
