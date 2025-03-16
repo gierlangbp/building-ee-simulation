@@ -420,6 +420,19 @@ function calculateEnergySavings() {
     const co2Reduction = energySavings * emissionFactor;
     const costSavings = energySavings * 1000 * electricityRate;
     const paybackPeriod = totalInvestment / costSavings || 0;
+    
+    // Get building area for EUI calculations
+    const buildingAreaText = document.getElementById('buildingArea').innerHTML;
+    const buildingArea = parseFloat(buildingAreaText.replace(' m²', '').replace(/\./g, '').replace(/,/g, '.'));
+    
+    // Calculate EUI (Energy Use Intensity) metrics
+    // Convert MWh to kWh for EUI calculation (1 MWh = 1000 kWh)
+    const baselineEUI = (baseConsumption * 1000) / buildingArea;
+    const improvedEUI = ((baseConsumption - energySavings) * 1000) / buildingArea;
+    const euiReductionPercentage = (baselineEUI - improvedEUI) / baselineEUI * 100;
+    
+    // Calculate investment per square meter
+    const investmentPerSqm = totalInvestment / buildingArea;
 
     // Update results - using innerHTML for the new result-box elements
     document.getElementById('energySavings').innerHTML = formatNumber(energySavings) + ' MWh/tahun';
@@ -427,6 +440,11 @@ function calculateEnergySavings() {
     document.getElementById('costSavings').innerHTML = 'Rp ' + formatNumber(costSavings) + '/tahun';
     document.getElementById('investment').innerHTML = 'Rp ' + formatNumber(totalInvestment, 0);
     document.getElementById('paybackPeriod').innerHTML = formatNumber(paybackPeriod) + ' tahun';
+    
+    // Update new metrics
+    document.getElementById('baselineEUI').innerHTML = formatNumber(baselineEUI) + ' kWh/m²/tahun';
+    document.getElementById('improvedEUI').innerHTML = formatNumber(improvedEUI) + ' kWh/m²/tahun<br><span class="reduction-percentage">↓ ' + formatNumber(euiReductionPercentage) + '%</span>';
+    document.getElementById('investmentPerSqm').innerHTML = 'Rp ' + formatNumber(investmentPerSqm, 0) + '/m²';
     
     // Calculate environmental impact equivalents
     // 1 tree absorbs approximately 21 kg of CO2 per year
