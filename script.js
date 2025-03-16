@@ -427,6 +427,16 @@ function calculateEnergySavings() {
     document.getElementById('costSavings').innerHTML = 'Rp ' + formatNumber(costSavings) + '/tahun';
     document.getElementById('investment').innerHTML = 'Rp ' + formatNumber(totalInvestment, 0);
     document.getElementById('paybackPeriod').innerHTML = formatNumber(paybackPeriod) + ' tahun';
+    
+    // Calculate environmental impact equivalents
+    // 1 tree absorbs approximately 21 kg of CO2 per year
+    const treesEquivalent = Math.round(co2Reduction * 1000 / 21);
+    // Convert CO2 reduction from tons to kg
+    const co2EquivalentInKg = Math.round(co2Reduction * 1000);
+    
+    // Update environmental impact metrics
+    document.getElementById('treesEquivalent').innerHTML = formatNumber(treesEquivalent, 0);
+    document.getElementById('co2EquivalentInKg').innerHTML = formatNumber(co2EquivalentInKg, 0);
 
     // Update chart with savings
     updateChartWithSavings(baseConsumption, energySavings);
